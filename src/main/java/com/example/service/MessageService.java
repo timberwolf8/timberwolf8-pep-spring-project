@@ -5,6 +5,7 @@ import com.example.repository.MessageRepository;
 import com.example.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,6 +59,10 @@ public class MessageService {
     }
 
     public List<Message> getMessagesByUser(int accountId) {
-        return messageRepository.findByPostedBy(accountId);
+        List<Message> messages = messageRepository.findByPostedBy(accountId);
+        return messages != null ? messages : new ArrayList<>();  // Return an empty list if no messages are found
     }
+    
+
+
 }
