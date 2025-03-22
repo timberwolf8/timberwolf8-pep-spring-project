@@ -19,54 +19,31 @@ public class MessageService {
         this.accountRepository = accountRepository;
     }
 
-    /**
-     * Creates a new message if:
-     * - messageText is not blank.
-     * - messageText is within 255 characters.
-     * - postedBy refers to a valid user.
-     * Returns the saved message or null if validation fails.
-     */
-    public Message createMessage(Message message) {
-        if (message.getMessageText() == null || message.getMessageText().trim().isEmpty() || 
-            message.getMessageText().length() > 255 || 
-            !accountRepository.existsById(message.getPostedBy())) {
-            return null;
+    public Optional<Message> createMessage(Message message) {
+        if (message.getMessageText() == null || message.getMessageText().trim().isEmpty() ||
+            message.getMessageText().length() > 255 || !accountRepository.existsById(message.getPostedBy())) {
+            return Optional.empty();
         }
-        return messageRepository.save(message);
+        Message savedMessage = messageRepository.save(message);
+        return Optional.of(savedMessage);
     }
 
-    /**
-     * Retrieves all messages from the database.
-     */
     public List<Message> getAllMessages() {
         return messageRepository.findAll();
     }
 
-    /**
-     * Retrieves a message by its ID.
-     */
     public Optional<Message> getMessageById(int messageId) {
         return messageRepository.findById(messageId);
     }
 
-    /**
-     * Deletes a message by its ID.
-     * Returns 1 if the message existed and was deleted, otherwise returns 0.
-     */
     public int deleteMessage(int messageId) {
         if (messageRepository.existsById(messageId)) {
             messageRepository.deleteById(messageId);
-            return 1;
+            return 1; // One row affected
         }
-        return 0;
+        return 0; // No rows affected
     }
 
-    /**
-     * Updates the text of a message if:
-     * - The message exists.
-     * - The new messageText is not blank and within 255 characters.
-     * Returns 1 if update was successful, otherwise returns 0.
-     */
     public int updateMessageText(int messageId, String newMessageText) {
         Optional<Message> optionalMessage = messageRepository.findById(messageId);
 
@@ -80,9 +57,6 @@ public class MessageService {
         return 0;
     }
 
-    /**
-     * Retrieves all messages posted by a specific user.
-     */
     public List<Message> getMessagesByUser(int accountId) {
         return messageRepository.findByPostedBy(accountId);
     }
