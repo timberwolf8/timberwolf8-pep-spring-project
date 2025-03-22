@@ -2,7 +2,6 @@ package com.example.service;
 
 import com.example.entity.Account;
 import com.example.repository.AccountRepository;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,27 +15,39 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public ResponseEntity<Account> registerAccount(Account account) {
-        if (account.getUsername() == null || account.getUsername().trim().isEmpty() ||
-            account.getPassword() == null || account.getPassword().length() < 4) {
-            return ResponseEntity.status(400).build();
+    /**
+     * Registers a new user account.
+     * Registration is successful if:
+     * - The username is not blank.
+     * - The password is at least 4 characters long.
+     * - The username is unique (not already in the database).
+     * If registration fails, returns null.
+     */
+    public Account registerAccount(Account account) {
+        if (account.getUsername() == null || account.getUsername().trim().isEmpty()) {
+            return null;
         }
-
+        if (account.getPassword() == null || account.getPassword().length() < 4) {
+            return null;
+        }
         if (accountRepository.findByUsername(account.getUsername()).isPresent()) {
-            return ResponseEntity.status(409).build();
+            return null;
         }
 
-        Account savedAccount = accountRepository.save(account);
-        return ResponseEntity.status(200).body(savedAccount);
+        return accountRepository.save(account);
     }
 
-    public ResponseEntity<Account> loginAccount(Account account) {
+    /**
+     * Authenticates a user by verifying the provided username and password.
+     * Returns the account if authentication is successful, otherwise returns null.
+     */
+    public Account authenticate(Account account) {
         Optional<Account> existingAccount = accountRepository.findByUsername(account.getUsername());
 
         if (existingAccount.isPresent() && existingAccount.get().getPassword().equals(account.getPassword())) {
-            return ResponseEntity.status(200).body(existingAccount.get());
-        } else {
-            return ResponseEntity.status(401).build();
+            return existingAccount.get();
         }
+
+        return null;
     }
 }

@@ -4,19 +4,11 @@ import com.example.entity.Account;
 import com.example.entity.Message;
 import com.example.service.AccountService;
 import com.example.service.MessageService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-/**
- * TODO: You will need to write your own endpoints and handlers for your controller using Spring. The endpoints you will need can be
- * found in readme.md as well as the test cases. You be required to use the @GET/POST/PUT/DELETE/etc Mapping annotations
- * where applicable as well as the @ResponseBody and @PathVariable annotations. You should
- * refer to prior mini-project labs and lecture materials for guidance on how a controller may be built.
- */
-
-
 
 @RestController
 @RequestMapping("/api")
@@ -30,43 +22,74 @@ public class SocialMediaController {
         this.messageService = messageService;
     }
 
+    // 1. User Registration
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody Account account) {
-        return accountService.registerAccount(account);
+        Account createdAccount = accountService.registerAccount(account);
+        if (createdAccount != null) {
+            return ResponseEntity.ok(createdAccount);
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
     }
 
+    // 2. User Login
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody Account account) {
-        return accountService.loginAccount(account);
+        Account authenticatedAccount = accountService.authenticate(account);
+        if (authenticatedAccount != null) {
+            return ResponseEntity.ok(authenticatedAccount);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
+    // 3. Create a new Message
     @PostMapping("/messages")
     public ResponseEntity<?> createMessage(@RequestBody Message message) {
-        return messageService.createMessage(message);
+        Message createdMessage = messageService.createMessage(message);
+        if (createdMessage != null) {
+            return ResponseEntity.ok(createdMessage);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
+    // 4. Retrieve all messages
     @GetMapping("/messages")
     public ResponseEntity<List<Message>> getAllMessages() {
-        return messageService.getAllMessages();
+        return ResponseEntity.ok(messageService.getAllMessages());
     }
 
+    // 5. Retrieve a message by its ID
     @GetMapping("/messages/{messageId}")
-    public ResponseEntity<?> getMessageById(@PathVariable int messageId) {
-        return messageService.getMessageById(messageId);
+    public ResponseEntity<Message> getMessageById(@PathVariable int messageId) {
+        return ResponseEntity.of(messageService.getMessageById(messageId));
     }
 
+    // 6. Delete a message by its ID
     @DeleteMapping("/messages/{messageId}")
-    public ResponseEntity<?> deleteMessage(@PathVariable int messageId) {
-        return messageService.deleteMessage(messageId);
+    public ResponseEntity<Integer> deleteMessage(@PathVariable int messageId) {
+        int deletedRows = messageService.deleteMessage(messageId);
+        if (deletedRows > 0) {
+            return ResponseEntity.ok(deletedRows);
+        }
+        return ResponseEntity.ok().build(); // Returning 200 with empty body if message doesn't exist
     }
 
+    // 7. Update a message's text
     @PatchMapping("/messages/{messageId}")
-    public ResponseEntity<?> updateMessage(@PathVariable int messageId, @RequestBody Message updatedMessage) {
-        return messageService.updateMessage(messageId, updatedMessage.getMessageText());
+    public ResponseEntity<Integer> updateMessage(@PathVariable int messageId, @RequestBody Message message) {
+        int updatedRows = messageService.updateMessageText(messageId, message.getMessageText());
+        if (updatedRows > 0) {
+            return ResponseEntity.ok(updatedRows);
+        }
+        return ResponseEntity.badRequest().build();
     }
 
+    // 8. Retrieve all messages posted by a particular user
     @GetMapping("/accounts/{accountId}/messages")
     public ResponseEntity<List<Message>> getMessagesByUser(@PathVariable int accountId) {
-        return messageService.getMessagesByUser(accountId);
+        return ResponseEntity.ok(messageService.getMessagesByUser(accountId));
     }
 }
