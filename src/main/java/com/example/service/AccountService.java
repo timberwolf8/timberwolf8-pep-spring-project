@@ -14,24 +14,20 @@ public class AccountService {
     }
 
     public Account registerUser(Account account) {
-        // Check if the username already exists
         if (accountRepository.findByUsername(account.getUsername()).isPresent()) {
-            return null; // If username exists, return null (conflict)
+            return null; 
         }
 
-        // Save the new account
         return accountRepository.save(account);
     }
 
     public Optional<Account> login(String username, String password) {
-        // Find the account by username
         Optional<Account> account = accountRepository.findByUsername(username);
         
-        // Check if password matches
         if (account.isPresent() && account.get().getPassword().equals(password)) {
             return account;
         }
         
-        return Optional.empty();  // Return empty if credentials are invalid
+        return Optional.empty();  
     }
 }

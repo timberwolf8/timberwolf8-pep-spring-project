@@ -29,14 +29,13 @@ public class SocialMediaController {
     public ResponseEntity<Account> registerUser(@RequestBody Account account) {
         Account createdAccount = accountService.registerUser(account);
         if (createdAccount == null) {
-            return ResponseEntity.status(409).build(); // Conflict if username exists
+            return ResponseEntity.status(409).build();
         }
-        return ResponseEntity.status(200).body(createdAccount); // Success
+        return ResponseEntity.status(200).body(createdAccount); 
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<Account> login(@RequestBody Account loginRequest) {
-        // Try to authenticate the user based on username and password
         Optional<Account> account = accountService.login(loginRequest.getUsername(), loginRequest.getPassword());
 
         if (account.isPresent()) {
@@ -80,7 +79,7 @@ public class SocialMediaController {
     @RequestMapping(value = "/accounts/{accountId}/messages", method = RequestMethod.GET)
     public ResponseEntity<List<Message>> getMessagesByUser(@PathVariable int accountId) {
         List<Message> messages = messageService.getMessagesByUser(accountId);
-        return ResponseEntity.ok(messages); // Always returns 200 status with the list, empty if no messages found
+        return ResponseEntity.ok(messages); 
     }
 
 

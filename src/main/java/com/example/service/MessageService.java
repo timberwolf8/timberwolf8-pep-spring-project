@@ -40,9 +40,9 @@ public class MessageService {
     public int deleteMessage(int messageId) {
         if (messageRepository.existsById(messageId)) {
             messageRepository.deleteById(messageId);
-            return 1; // One row affected
+            return 1; 
         }
-        return 0; // No rows affected
+        return 0; 
     }
 
     public int updateMessageText(int messageId, String newMessageText) {
@@ -60,7 +60,7 @@ public class MessageService {
 
     public List<Message> getMessagesByUser(int accountId) {
         List<Message> messages = messageRepository.findByPostedBy(accountId);
-        return messages != null ? messages : new ArrayList<>();  // Return an empty list if no messages are found
+        return messages != null ? messages : new ArrayList<>();  
     }
     
 
